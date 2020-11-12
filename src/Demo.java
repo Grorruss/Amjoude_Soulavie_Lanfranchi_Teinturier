@@ -1,9 +1,12 @@
+import java.awt.*;
 import java.io.File;
 import java.net.URL;
 import org.bytedeco.javacv.*;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacpp.indexer.*;
+import org.bytedeco.javacv.Frame;
 import org.bytedeco.opencv.opencv_core.*;
+import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_imgproc.*;
 import org.bytedeco.opencv.opencv_calib3d.*;
 import org.bytedeco.opencv.opencv_objdetect.*;
@@ -85,7 +88,9 @@ public class Demo {
         System.out.println(Ridx);
 
         // We can allocate native arrays using constructors taking an integer as argument.
+        Point hatPoints = new Point(3);
         Point nosePoints = new Point(1);
+        Robot myRobot = new Robot();
 
         while (frame.isVisible() && (grabbedImage = converter.convert(grabber.grab())) != null) {
             // Let's try to detect some faces! but we need a grayscale image...
@@ -97,13 +102,18 @@ public class Demo {
                 Rect r = faces.get(i);
                 int x = r.x(), y = r.y(), w = r.width(), h = r.height();
                 rectangle(grabbedImage, new Point(x, y), new Point(x + w, y + h), Scalar.RED, 1, CV_AA, 0);
-                // To access or pass as argument the elements of a native array, call position() before.
-                /*hatPoints.position(0).x(x - w / 10     ).y(y - h / 10);
-                hatPoints.position(1).x(x + w * 11 / 10).y(y - h / 10);
-                hatPoints.position(2).x(x + w / 2      ).y(y - h / 2 );*/
+
                 nosePoints.position(0).x(x + w /2).y(y + h / 2);
-                //fillConvexPoly(grabbedImage, nosePoints.position(0), 3, Scalar.RED, CV_AA, 0);
                 circle(grabbedImage, nosePoints.position(0), w/10, Scalar.RED, CV_FILLED, CV_AA, 0);
+                myRobot.mouseMove(x+w/2, y+h/2);
+                
+                
+
+                // To access or pass as argument the elements of a native array, call position() before.
+                hatPoints.position(0).x(x - w / 10     ).y(y - h / 10);
+                hatPoints.position(1).x(x + w * 11 / 10).y(y - h / 10);
+                hatPoints.position(2).x(x + w / 2      ).y(y - h / 2 );
+                fillConvexPoly(grabbedImage, hatPoints.position(0), 3, Scalar.GREEN, CV_AA, 0);
             }
 
             // Let's find some contours! but first some thresholding...
